@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat and URL Indexer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        #url-input {
+            margin-bottom: 20px;
+        }
+        #chat-container {
+            border-top: 1px solid #ccc;
+            margin-top: 20px;
+            padding-top: 10px;
+        }
+        .message {
+            margin: 5px 0;
+        }
+        .user { text-align: right; color: blue; }
+        .assistant { text-align: left; color: green; }
+        #chat-window {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>URL Indexer and Chat</h1>
+    
+    <div id="url-input">
+        <h2>Enter URLs to Index</h2>
+        <input type="text" id="urls" placeholder="Enter URLs separated by commas" />
+        <button id="index-urls">Index URLs</button>
+    </div>
+    
+    <div id="chat-container">
+        <h2>Chat with Assistant</h2>
+        <div id="chat-window"></div>
+        <input type="text" id="user-query" placeholder="Type your message..." />
+        <button id="send-message">Send</button>
+        <button id="reset-chat">Reset Chat</button>
+    </div>
+
+    <script>
+        let messages = [];
+
+        document.getElementById('index-urls').onclick = async function() {
+            const urlInput = document.getElementById('urls').value;
+            const urls = urlInput.split(',').map(url => url.trim());
+            const payload = { url: urls };
+
+            try {
+                const response = await fetch('https://c24a-203-192-253-23.ngrok-free.app/api/v1/index', {
+                    method: 'POST',
+                    headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Basic ' + btoa('your_username:your_password') // Basic auth
+                            },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                alert('URLs indexed successfully: ' + JSON.stringify(data.indexed_urls));
+            } catch (error) {
+                alert('Error indexing URLs: ' + error.message);
+            }
+        };
+
+        document.getElementById('send-message').onclick = async function() {
+            const userQuery = document.getElementById('user-query').value;
+            const userMessage = { content: userQuery, role: 'user' };
+            messages.push(userMessage);
+            displayMessage(userMessage);
+
+            const payload = { messages };
+
+            try {
+                const response = await fetch('https://c24a-203-192-253-23.ngrok-free.app/api/v1/chat', {
+                    method: 'POST',
+                    headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Basic ' + btoa('your_username:your_password') // Basic auth
+                        },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                const assistantMessage = data.response[0].answer;
+                messages.push(assistantMessage);
+                displayMessage(assistantMessage);
+                document.getElementById('user-query').value = ''; // Clear input
+            } catch (error) {
+                alert('Error sending message: ' + error.message);
+            }
+        };
+
+        document.getElementById('reset-chat').onclick = function() {
+            messages = [];
+            document.getElementById('chat-window').innerHTML = '';
+        };
+
+        function displayMessage(message) {
+            const chatWindow = document.getElementById('chat-window');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', message.role);
+            messageDiv.textContent = message.content;
+            chatWindow.appendChild(messageDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll to bottom
+        }
+    </script>
+</body>
+</html>
