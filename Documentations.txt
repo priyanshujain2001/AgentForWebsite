@@ -1,0 +1,37 @@
+
+#### Workflow
+- The `scrape_and_chunk` method is called to scrape content from URLs.
+- The content is parsed, and relevant text is extracted and chunked for storage.
+- Returns a structured result containing the scraped text and metadata.
+
+## Project Structure
+
+The following are the key components of the project:
+
+### 1. **Frontend**
+- `frontend/index.html`: Contains the HTML structure for the chat interface, enabling user interaction.
+-  you can use ngrok to bypass other issues just up the server in your url and expos port 8081 using ngrok tunneling
+
+### 2. **Backend**
+- `completion.py`: Contains logic for generating AI responses, including setting up logging and interacting with the generative AI model.
+- `embeddings.py`: Handles the embedding generation using Jina.
+- `scrape_website.py`: Implements web scraping functionality and text chunking.
+- `vector_db.py`: Interacts with Pinecone for upserting embeddings and retrieving them based on user queries.
+
+### 3. **Environment Management**
+- `.env.example`: Contains example key-value pairs for required environment variables, such as API keys.
+
+### 4. **Dependencies**
+- `requirment.txt`: Lists all the required Python packages for the project.
+
+## How It Works
+
+1. **User Interaction**: Users can input a URL to scrape or ask a question.
+2. **Web Scraping**: Upon receiving a URL, the application scrapes its content, processes the text into manageable chunks, and stores embeddings into a vector database.
+3. **Generative Responses**: When a user asks a question, it sends the context (possibly derived from previously scraped content) to the generative AI model.
+4. **Embeddings Retrieval**: Users can also send text that needs to be embedded, which is then stored in the vector database for fast retrieval during searches.
+5. **Citations**: The system maintains a citation mechanism that tracks the sources of information provided during chat interactions.
+
+## Conclusion
+
+This project integrates various technologies to provide a seamless user experience while harnessing the power of AI for both conversational interface and intelligent content management. The combination of web scraping, text chunking, and embedding generation positions it well for future enhancements and broader applications.
